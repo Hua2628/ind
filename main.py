@@ -405,6 +405,10 @@ def main():
               "style": "9", // 設定為空心 K 線
               "locale": "zh_TW",
               "container_id": "tv_chart",
+              "hide_side_toolbar": false,     // 顯示左側繪圖工具列
+              "allow_symbol_change": true,    // 允許手動變更代號
+              "save_image": true,             // 允許儲存圖表截圖
+              "withdateranges": true,         // 顯示底部時間範圍選擇器
               "studies": [ {{ "id": "Overlay@tv-basicstudies", "inputs": {{ "symbol": "SPY", "title": "S&P 500" }}, "forceOverlay": true }} ],
               "studies_overrides": {{ "overlay.style": 9 }}, // 副圖/疊加也設定為空心
               "overrides": {{
@@ -440,4 +444,5 @@ def main():
     print(f"✨ 完成！請開啟 index.html 查看結果。5D 與 120D 欄位已補齊，且圖表已設定為空心 K 線。")
 
 if __name__ == "__main__":
+
     main()
