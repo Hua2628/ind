@@ -396,7 +396,7 @@ def main():
             if (container) container.innerHTML = "";
             let tvSymbol = symbol.includes(".HK") ? "HKG:" + symbol.replace(".HK", "") : symbol.split(".")[0];
             
-            new TradingView.widget({{
+            const tvWidget = new TradingView.widget({
               "autosize": true,
               "symbol": tvSymbol,
               "interval": "D",
@@ -405,20 +405,38 @@ def main():
               "style": "9", // 設定為空心 K 線
               "locale": "zh_TW",
               "container_id": "tv_chart",
-              "hide_side_toolbar": false,     // 顯示左側繪圖工具列
-              "allow_symbol_change": true,    // 允許手動變更代號
-              "save_image": true,             // 允許儲存圖表截圖
-              "withdateranges": true,         // 顯示底部時間範圍選擇器
-              "studies": [ {{ "id": "Overlay@tv-basicstudies", "inputs": {{ "symbol": "SPY", "title": "S&P 500" }}, "forceOverlay": true }} ],
-              "studies_overrides": {{ "overlay.style": 9 }}, // 副圖/疊加也設定為空心
-              "overrides": {{
+              "hide_side_toolbar": false,
+              "allow_symbol_change": true,
+              "save_image": true,
+              "withdateranges": true, // 靜態載入只保留 SPY 與成交量
+              "studies": [
+                {
+                  "id": "Overlay@tv-basicstudies",
+                  "inputs": { "symbol": "SPY", "title": "S&P 500" },
+                  "forceOverlay": true
+                },
+                { "id": "MASimple@tv-basicstudies", "inputs": { "length": 10 } }, // 1. 10 SMA
+                { "id": "MASimple@tv-basicstudies", "inputs": { "length": 20 } }, // 2. 20 SMA
+                { "id": "MAWeighted@tv-basicstudies", "inputs": { "length": 50 } }, // 3. 50 WMA (藍色)
+                { "id": "MAExp@tv-basicstudies", "inputs": { "length": 200 } }, // 4. 200 EMA (紅色)
+                "Volume@tv-basicstudies"
+              ],
+              "studies_overrides": {
+                "overlay.style": 9,
+                "moving average.ma.color": "#787b86", // SMA 10 & 20 統一設為灰色
+                "moving average.ma.linewidth": 1,
+                "moving average weighted.ma.color": "#2196F3", // WMA 50 設為藍色
+                "moving average weighted.ma.linewidth": 1,
+                "moving average exponential.ma.color": "#f23645", // EMA 200 設為紅色
+                "moving average exponential.ma.linewidth": 1
+              },
+              "overrides": {
                 "mainSeriesProperties.style": 9,
                 "mainSeriesProperties.hollowCandleStyle.upColor": "#089981",
                 "mainSeriesProperties.hollowCandleStyle.downColor": "#f23645",
                 "mainSeriesProperties.hollowCandleStyle.drawWick": true
-              }}
-            }});
-          }};
+              }
+            });
 
           const sortMarket = (key) => {{ if (marketSortKey.value === key) marketSortOrder.value *= -1; else {{ marketSortKey.value = key; marketSortOrder.value = -1; }} }};
           const sortHoldings = (key) => {{ if (holdingsSortKey.value === key) holdingsSortOrder.value *= -1; else {{ holdingsSortKey.value = key; holdingsSortOrder.value = -1; }} }};
@@ -446,3 +464,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
