@@ -246,9 +246,10 @@ def main():
             "holdings": cat_holdings
         })
 
-    # --- 4. 生成 index.html (包含您的原始樣式與修正後的 TV 參數) ---
+# --- 4. 生成 index.html (包含您的原始樣式與修正後的 TV 參數) ---
     print("📄 正在產生 index.html...")
-    json_data = json.dumps(final_output_data, ensure_ascii=False)
+    # 注意：這裡直接使用 final_output_data 進行 json.dumps，json_data 變數會被填入 JS 中
+    json_data_string = json.dumps(final_output_data, ensure_ascii=False)
     
     full_html = f"""<!doctype html>
 <html lang="zh-TW">
@@ -365,7 +366,7 @@ def main():
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-      const DATA_ALL = {json.dumps(json_data)};
+      const DATA_ALL = {json_data_string};
       const {{ createApp, ref, onMounted, computed }} = Vue;
       createApp({{
         setup() {{
@@ -468,3 +469,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
