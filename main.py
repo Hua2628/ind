@@ -293,9 +293,11 @@ def main():
               <tr>
                 <th @click="sortMarket('代號')" class="sortable text-start ps-3">代號</th>
                 <th @click="sortMarket('昨日')" class="sortable">昨日</th>
-                <th @click="sortMarket('5日')" class="sortable">5D</th> <th @click="sortMarket('20日')" class="sortable">20D</th>
+                <th @click="sortMarket('5日')" class="sortable">5D</th> 
+                <th @click="sortMarket('20日')" class="sortable">20D</th>
                 <th @click="sortMarket('60日')" class="sortable">60D</th>
-                <th @click="sortMarket('120日')" class="sortable">120D</th> <th @click="sortMarket('250日')" class="sortable">250D</th>
+                <th @click="sortMarket('120日')" class="sortable">120D</th> 
+                <th @click="sortMarket('250日')" class="sortable">250D</th>
               </tr>
             </thead>
             <tbody>
@@ -363,7 +365,7 @@ def main():
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-      const DATA_ALL = {json_data};
+      const DATA_ALL = {json.dumps(json_data)};
       const {{ createApp, ref, onMounted, computed }} = Vue;
       createApp({{
         setup() {{
@@ -385,7 +387,9 @@ def main():
             const combinedHoldings = {{}};
             allCategories.value.forEach(src => {{ Object.assign(combinedHoldings, src.holdings); }});
             allHoldings.value = combinedHoldings;
-            if (allCategories.value.length > 0) selectETF(allCategories.value[0].market[0]);
+            if (allCategories.value.length > 0 && allCategories.value[0].market.length > 0) {{
+                selectETF(allCategories.value[0].market[0]);
+            }}
           }};
 
           const selectETF = (item) => {{ selectedETF.value = item; currentDisplay.value = item; updateChart(item.代號); }};
@@ -396,47 +400,48 @@ def main():
             if (container) container.innerHTML = "";
             let tvSymbol = symbol.includes(".HK") ? "HKG:" + symbol.replace(".HK", "") : symbol.split(".")[0];
             
-            const tvWidget = new TradingView.widget({
+            new TradingView.widget({{
               "autosize": true,
               "symbol": tvSymbol,
               "interval": "D",
               "timezone": "Asia/Taipei",
               "theme": "light",
-              "style": "9", // 設定為空心 K 線
+              "style": "9",
               "locale": "zh_TW",
               "container_id": "tv_chart",
               "hide_side_toolbar": false,
               "allow_symbol_change": true,
               "save_image": true,
-              "withdateranges": true, // 靜態載入只保留 SPY 與成交量
+              "withdateranges": true,
               "studies": [
-                {
+                {{
                   "id": "Overlay@tv-basicstudies",
-                  "inputs": { "symbol": "SPY", "title": "S&P 500" },
+                  "inputs": {{ "symbol": "SPY", "title": "S&P 500" }},
                   "forceOverlay": true
-                },
-                { "id": "MASimple@tv-basicstudies", "inputs": { "length": 10 } }, // 1. 10 SMA
-                { "id": "MASimple@tv-basicstudies", "inputs": { "length": 20 } }, // 2. 20 SMA
-                { "id": "MAWeighted@tv-basicstudies", "inputs": { "length": 50 } }, // 3. 50 WMA (藍色)
-                { "id": "MAExp@tv-basicstudies", "inputs": { "length": 200 } }, // 4. 200 EMA (紅色)
+                }},
+                {{ "id": "MASimple@tv-basicstudies", "inputs": {{ "length": 10 }} }},
+                {{ "id": "MASimple@tv-basicstudies", "inputs": {{ "length": 20 }} }},
+                {{ "id": "MAWeighted@tv-basicstudies", "inputs": {{ "length": 50 }} }},
+                {{ "id": "MAExp@tv-basicstudies", "inputs": {{ "length": 200 }} }},
                 "Volume@tv-basicstudies"
               ],
-              "studies_overrides": {
+              "studies_overrides": {{
                 "overlay.style": 9,
-                "moving average.ma.color": "#787b86", // SMA 10 & 20 統一設為灰色
+                "moving average.ma.color": "#787b86",
                 "moving average.ma.linewidth": 1,
-                "moving average weighted.ma.color": "#2196F3", // WMA 50 設為藍色
+                "moving average weighted.ma.color": "#2196F3",
                 "moving average weighted.ma.linewidth": 1,
-                "moving average exponential.ma.color": "#f23645", // EMA 200 設為紅色
+                "moving average exponential.ma.color": "#f23645",
                 "moving average exponential.ma.linewidth": 1
-              },
-              "overrides": {
+              }},
+              "overrides": {{
                 "mainSeriesProperties.style": 9,
                 "mainSeriesProperties.hollowCandleStyle.upColor": "#089981",
                 "mainSeriesProperties.hollowCandleStyle.downColor": "#f23645",
                 "mainSeriesProperties.hollowCandleStyle.drawWick": true
-              }
-            });
+              }}
+            }});
+          }};
 
           const sortMarket = (key) => {{ if (marketSortKey.value === key) marketSortOrder.value *= -1; else {{ marketSortKey.value = key; marketSortOrder.value = -1; }} }};
           const sortHoldings = (key) => {{ if (holdingsSortKey.value === key) holdingsSortOrder.value *= -1; else {{ holdingsSortKey.value = key; holdingsSortOrder.value = -1; }} }};
@@ -455,13 +460,11 @@ def main():
       }}).mount("#app");
     </script>
   </body>
-</html>"""
-
+</html>
+"""
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
-    print(f"✨ 完成！請開啟 index.html 查看結果。5D 與 120D 欄位已補齊，且圖表已設定為空心 K 線。")
+    print("✨ 完成！請開啟 index.html 查看結果。")
 
 if __name__ == "__main__":
-
     main()
-
